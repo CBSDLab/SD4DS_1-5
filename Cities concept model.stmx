@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>Cities concept model v9</name>
+		<uuid>eed773d1-f4f7-4725-8d05-452b96d4f2dc</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="3.5" isee:build_number="3121" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="0" isee:run_prefix="Run" isee:simulation_delay="0" isee:restore_on_start="false" method="Euler" time_units="Years" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="false" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>2000</start>
+		<stop>2030</stop>
+		<dt reciprocal="true">4</dt>
+	</sim_specs>
+	<isee:prefs saved_runs="6" keep="false" show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" isee:design="Deluxe Prev-Next Blue Green Pastel" isee:design_custom="false" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" rifp="true">
+		<isee:ignored_words>
+			<isee:ignored_word>capita</isee:ignored_word>
+		</isee:ignored_words>
+	</isee:prefs>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" max_advance_time_in_ms="0" model_stops_when_players_drop="false" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+		<isee:time_format name="Number Not Scaled With Precision of 1" precision="1" scale_by="1" type="number"/>
+		<isee:time_format name="Quarters" type="grouped" start_offset="0" start_offset_units="years">
+			<isee:time_format_groupings>
+				<isee:time_format_grouping unit="years" prefix="Yr "/>
+				<isee:time_format_grouping unit="quarters" prefix=" Q"/>
+				<isee:time_format_grouping unit="months" prefix=" M"/>
+				<isee:time_format_grouping unit="days" prefix=" "/>
+			</isee:time_format_groupings>
+		</isee:time_format>
+	</isee:time_formats>
+	<isee:number_format_extenders/>
+	<default_format/>
+	<model_units>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+		</unit>
+		<unit name="kilowatt hours per day">
+			<eqn>kWh/day</eqn>
+		</unit>
+		<unit name="kilowatts">
+			<eqn>kW</eqn>
+			<alias>kilowatt</alias>
+		</unit>
+	</model_units>
+	<model>
+		<isee:extra_collection_variables>
+			<isee:extra_collection_variable name="Population"/>
+			<isee:extra_collection_variable name="Pollution"/>
+		</isee:extra_collection_variables>
+		<variables>
+			<stock name="Population">
+				<doc>Total city population</doc>
+				<eqn>Initial_Population</eqn>
+				<inflow>Births</inflow>
+				<inflow>Immigration</inflow>
+				<outflow>Deaths</outflow>
+				<outflow>Migration</outflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<flow name="Immigration">
+				<doc>Net migration represents the movement into and out of a city, which is function of the current population and fractional rate of change. Positive values mean people moving into the city while negative values mean people moving out of the city.</doc>
+				<eqn>MAX(Base_Immigration_Rate*Population*Attractiveness_of_City, 0)</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<aux name="Attractiveness\nof City">
+				<doc>Attractiveness of the city is represented as a multiplier that is a ratio of the initial mortality rate to the delayed perceptions of the mortality rate. Attractiveness = 1.0 means that the city has the same attractiveness as the city had at the start of the simulation, a value of 2.0 means that the city has twice the attractiveness relative to the start of the simulation, and a value of 0.5 means that the city has an attractiveness that is half the value of the city&apos;s attractiveness at the start of the simulation. Attractiveness of the city is assumed to be strictly a function of the perceived mortality rate relative to the initial mortality rate for the city. 
+</doc>
+				<eqn>INIT(Mortality_Rate)/SMTH3(Mortality_Rate, Average_Delay_for_Attractiveness_of_City_to_Change_in_Response_to_Mortality) - .5</eqn>
+				<units>Dimensionless</units>
+			</aux>
+			<flow name="Births">
+				<doc>Births per year in the city. </doc>
+				<eqn>Crude_Birth_Rate*
+Population</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<flow name="Deaths">
+				<doc>Deaths represents the total deaths per year, which is a function of the number of people in the city and mortality rate. </doc>
+				<eqn>Population*
+Mortality_Rate</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<aux name="Mortality\nRate">
+				<doc>Mortality rate is a function of the base mortality rate for the overall population and effect of pollution on mortality. The effects of pollution on mortality are assumed to be delayed with average lag between exposure on mortality of approximately, which are represented by the built in function for a third order material delay.</doc>
+				<eqn>Base_Mortality_Rate*DELAY3(Effect_of_pollution_on_mortality, Average_Delay_Between_Exposure_and_Mortality)</eqn>
+				<units>1/year</units>
+			</aux>
+			<aux name="Crude\nBirth Rate">
+				<doc>Crude birth rate represents the factional rate of population growth due to births. Note that the crude birth rate is unaffected by pollution, but this is clearly incorrect as early exposures to toxins can affect neonatal birth outcomes and hence the live birth rate. </doc>
+				<eqn>0.05</eqn>
+				<units>Dimensionless/year</units>
+			</aux>
+			<stock name="Pollution">
+				<doc>Total environmental pollution in city in (provisional) units of pollution. Range is from 0 to +infinity.</doc>
+				<eqn>Initial_Pollution</eqn>
+				<inflow>Polluting</inflow>
+				<outflow>Pollution_Breaking_Down</outflow>
+				<non_negative/>
+				<units>Pollution units</units>
+			</stock>
+			<flow name="Polluting">
+				<doc>Annual generation of pollution. </doc>
+				<eqn>Population*
+Per_Capita_Pollution_per_Year</eqn>
+				<non_negative/>
+				<units>Pollution units/Years</units>
+			</flow>
+			<flow name="Pollution\nBreaking\nDown">
+				<doc>Breakdown of pollutants in city.</doc>
+				<eqn>Pollution/
+&quot;Average_Half-life_of_Pollution&quot;</eqn>
+				<non_negative/>
+				<units>Pollution units/Years</units>
+			</flow>
+			<aux name="Effect of\npollution on mortality">
+				<doc>Effect of pollution on mortality rate represented as a multiplier (i.e., hazard rate ratio) where the effect is a function of the level of pollution in the city. </doc>
+				<eqn>Pollution</eqn>
+				<gf type="extrapolate">
+					<xscale min="0" max="400"/>
+					<yscale min="0" max="4"/>
+					<ypts>1,1,1,1.101,1.217,1.333,1.565,1.778,2.048</ypts>
+				</gf>
+				<units>Dimensionless</units>
+			</aux>
+			<aux name="Average\nHalf-life of\nPollution">
+				<doc>Average half-life to decay of all environmental pollutants in years. </doc>
+				<eqn>33.9433372691599</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="Per Capita\nPollution per\nYear">
+				<doc>Average per capita generation of pollution in units of pollution units per person per year. </doc>
+				<eqn>0.00106970286185</eqn>
+				<units>Pollution units/Person/Year</units>
+			</aux>
+			<aux name="Base Mortality\nRate">
+				<doc>Overall base mortality rate for city population. </doc>
+				<eqn>0.00522309232448597</eqn>
+				<units>1/Years</units>
+			</aux>
+			<aux name="Initial Pollution">
+				<doc>Initial level of environmental pollution at the start of the simulation, currently in provisional units of pollution. </doc>
+				<eqn>32.2212803552374</eqn>
+				<units>Pollution units</units>
+			</aux>
+			<aux name="Average Delay\nBetween Exposure\nand Mortality">
+				<doc>Average length of delay between pollution exposure and mortality in years.</doc>
+				<eqn>30</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="Average Delay for\nAttractiveness of City to\nChange in Response to\nMortality">
+				<doc>Average length of delay between changes in the mortality rate and changes in the attractiveness of the city. This is initially assumed to be 10 years since mortality statistics due to environmental exposures are delayed due to data collection, census estimates, peer review, and dissemination of statistic view news and social media. </doc>
+				<eqn>10</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="Initial Population">
+				<doc>Initial city population at the start of the simulation. </doc>
+				<eqn>1000000</eqn>
+				<units>People</units>
+			</aux>
+			<flow name="Migration">
+				<eqn>MAX(-Attractiveness_of_City*Base_Migration_Rate*Population, 0)</eqn>
+				<non_negative/>
+				<units>People/Years</units>
+			</flow>
+			<aux name="Base Migration Rate">
+				<eqn>0.1</eqn>
+			</aux>
+			<aux name="Base\nImmigration\nRate">
+				<eqn>0.1</eqn>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" border_width="thin" border_style="solid" isee:transparent="false" isee:show_divider="true" isee:show_bounding_box="true" label_side="left"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:stacked_container color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+				<isee:dual_slider color="black" background="white" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="black" background="white"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<numeric_input color="black" background="white" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true" corner_radius="1"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="white" text_align="right" font_size="12pt" hide_border="false" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="65" zoom="120" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</flow>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" border_width="thin" border_style="solid" isee:transparent="false" isee:show_divider="true" isee:show_bounding_box="true" label_side="left"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock label_side="center" x="276.905" y="220.119" width="60.8333" height="58.3333" name="Population"/>
+				<flow label_side="top" x="220.583" y="308.333" name="Immigration">
+					<pts>
+						<pt x="142.5" y="308.333"/>
+						<pt x="286.667" y="308.333"/>
+						<pt x="286.667" y="278.453"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="225" x="140.53" y="459.667" name="Attractiveness\nof City"/>
+				<connector uid="3" angle="181.049">
+					<from>Population</from>
+					<to>Immigration</to>
+				</connector>
+				<stacked_container uid="4" x="720" y="141.309" width="401.667" height="250">
+					<graph width="401.667" height="250" type="time_series" isee:time_format_id="Number Not Scaled With Precision of 1" isee:time_precision="1" isee:time_scale_by="1" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="true" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="7" num_y_labels="3" title="Population" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Population"/>
+							<scale min="0"/>
+						</plot>
+						<plot color="red" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Pollution"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<flow label_side="left" x="311.667" y="141.31" name="Births">
+					<pts>
+						<pt x="311.667" y="62.5"/>
+						<pt x="311.667" y="220.119"/>
+					</pts>
+				</flow>
+				<flow label_side="top" x="425.262" y="259.167" name="Deaths">
+					<pts>
+						<pt x="337.738" y="259.167"/>
+						<pt x="536.786" y="259.167"/>
+					</pts>
+				</flow>
+				<connector uid="5" polarity="+" isee:polarity_placement="inside" angle="30.0367">
+					<from>Population</from>
+					<to>Births</to>
+				</connector>
+				<connector uid="6" polarity="+" isee:polarity_placement="inside" angle="298.596">
+					<from>Population</from>
+					<to>Deaths</to>
+				</connector>
+				<aux label_side="right" label_angle="45" x="562.25" y="354.916" name="Mortality\nRate"/>
+				<aux label_side="right" x="352.381" y="93.25" name="Crude\nBirth Rate"/>
+				<connector uid="7" polarity="+" isee:polarity_placement="outside" angle="229.73">
+					<from>Crude_Birth_Rate</from>
+					<to>Births</to>
+				</connector>
+				<connector uid="8" polarity="+" isee:polarity_placement="inside" angle="115.421">
+					<from>Mortality_Rate</from>
+					<to>Deaths</to>
+				</connector>
+				<stock label_side="center" x="417.5" y="436.667" name="Pollution"/>
+				<flow x="347.083" y="436.667" name="Polluting">
+					<pts>
+						<pt x="304.167" y="436.667"/>
+						<pt x="390" y="436.667"/>
+					</pts>
+				</flow>
+				<flow label_side="left" x="415.833" y="526.167" name="Pollution\nBreaking\nDown">
+					<pts>
+						<pt x="415.833" y="459.167"/>
+						<pt x="415.833" y="614.167"/>
+					</pts>
+				</flow>
+				<connector uid="9" polarity="+" isee:polarity_placement="outside" angle="260.577">
+					<from>Population</from>
+					<to>Polluting</to>
+				</connector>
+				<aux x="516.75" y="410.095" name="Effect of\npollution on mortality"/>
+				<connector uid="10" polarity="+" isee:polarity_placement="inside" angle="4.51399">
+					<from>Pollution</from>
+					<to>Effect_of_pollution_on_mortality</to>
+				</connector>
+				<connector uid="11" polarity="+" isee:polarity_placement="inside" delay_mark="true" angle="37.8112">
+					<from>Effect_of_pollution_on_mortality</from>
+					<to>Mortality_Rate</to>
+				</connector>
+				<connector uid="12" polarity="-" isee:polarity_placement="inside" delay_mark="true" angle="289.491">
+					<from>Mortality_Rate</from>
+					<to>Attractiveness_of_City</to>
+				</connector>
+				<aux label_side="right" label_angle="45" x="495.75" y="499.417" name="Average\nHalf-life of\nPollution"/>
+				<connector uid="13" polarity="-" isee:polarity_placement="outside" angle="241.949">
+					<from>&quot;Average_Half-life_of_Pollution&quot;</from>
+					<to>Pollution_Breaking_Down</to>
+				</connector>
+				<connector uid="14" polarity="+" isee:polarity_placement="inside" angle="329.301">
+					<from>Pollution</from>
+					<to>Pollution_Breaking_Down</to>
+				</connector>
+				<aux x="287.881" y="471.31" name="Per Capita\nPollution per\nYear"/>
+				<connector uid="15" angle="30.3345">
+					<from>Per_Capita_Pollution_per_Year</from>
+					<to>Polluting</to>
+				</connector>
+				<text_box font_style="italic" text_align="center" vertical_text_align="center" font_size="9pt" appearance="transparent" uid="25" x="431.406" y="161.095" width="63.5714" height="24.286">Deaths</text_box>
+				<text_box font_style="italic" text_align="center" vertical_text_align="center" font_size="9pt" appearance="transparent" uid="26" x="431.406" y="185.381" width="63.5714" height="24.286">Births</text_box>
+				<text_box font_style="italic" text_align="center" vertical_text_align="center" font_size="9pt" appearance="transparent" uid="27" x="479.411" y="342.773" width="63.5714" height="24.286">Health effects</text_box>
+				<text_box font_style="italic" text_align="center" vertical_text_align="center" font_size="9pt" appearance="transparent" uid="28" x="706.012" y="546.631" width="63.5714" height="24.286">Decay</text_box>
+				<aux x="619.096" y="418.667" name="Base Mortality\nRate"/>
+				<connector uid="30" polarity="+" isee:polarity_placement="outside" angle="114.411">
+					<from>Base_Mortality_Rate</from>
+					<to>Mortality_Rate</to>
+				</connector>
+				<aux label_side="top" x="642.381" y="167.524" name="Initial Pollution"/>
+				<aux label_side="left" x="477.75" y="376.059" name="Average Delay\nBetween Exposure\nand Mortality"/>
+				<connector uid="31" polarity="-" isee:polarity_placement="inside" angle="356.396">
+					<from>Average_Delay_Between_Exposure_and_Mortality</from>
+					<to>Mortality_Rate</to>
+				</connector>
+				<aux x="122.53" y="568.096" name="Average Delay for\nAttractiveness of City to\nChange in Response to\nMortality"/>
+				<connector uid="32" angle="102.834">
+					<from>Average_Delay_for_Attractiveness_of_City_to_Change_in_Response_to_Mortality</from>
+					<to>Attractiveness_of_City</to>
+				</connector>
+				<aux label_side="top" x="642.381" y="107.215" name="Initial Population"/>
+				<flow label_side="top" x="218.095" y="195.833" name="Migration">
+					<pts>
+						<pt x="283.857" y="220.119"/>
+						<pt x="283.857" y="195.833"/>
+						<pt x="128.333" y="195.833"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="207.048" y="134.309" name="Base Migration Rate"/>
+				<aux x="220.583" y="358.059" name="Base\nImmigration\nRate"/>
+				<connector uid="35" angle="280.18">
+					<from>Base_Migration_Rate</from>
+					<to>Migration</to>
+				</connector>
+				<connector uid="36" angle="90">
+					<from>Base_Immigration_Rate</from>
+					<to>Immigration</to>
+				</connector>
+				<connector uid="37" angle="81.3818">
+					<from>Attractiveness_of_City</from>
+					<to>Immigration</to>
+				</connector>
+				<connector uid="38" angle="170.526">
+					<from>Population</from>
+					<to>Migration</to>
+				</connector>
+				<connector uid="41" angle="138.229">
+					<from>Attractiveness_of_City</from>
+					<to>Migration</to>
+				</connector>
+				<isee:loop_indicator text="B1" orientation="clockwise" uid="42" x="168.048" y="220.167" width="35" height="33.3333">
+					<isee:entities>
+						<item uid="41"/>
+						<item uid="9"/>
+						<item uid="10"/>
+						<item uid="11"/>
+						<item uid="12"/>
+						<entity name="Migration"/>
+						<entity name="Population"/>
+						<entity name="Polluting"/>
+						<entity name="Pollution"/>
+						<entity name="Effect_of_pollution_on_mortality"/>
+						<entity name="Mortality_Rate"/>
+						<entity name="Attractiveness_of_City"/>
+					</isee:entities>
+				</isee:loop_indicator>
+			</view>
+			<view background="white" page_width="1066" page_height="600" home_view="true" type="interface">
+				<style>
+					<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+				</style>
+				<text_box x="20" y="69" width="1029" height="118">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.AppleSystemUIFont&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:700; color:#000000;&quot;&gt;Exploring the Structure-Behavior Relationship in  System Dynamics&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Peter Hovmand - October 28, 2022&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text_box>
+				<text_box x="20" y="139" width="1021" height="445">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.AppleSystemUIFont&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;At the heart of system dynamics is the structure-behavior relationship. The structure-behavior relationship refers to how a system of stocks and flows (state variables and rates of change) are coupled through a system of feedback loops generates the dynamic behavior of the system. Put more simply, the emphasis in system dynamics is on understanding the dynamics of a system endogenously, i.e., through a set of balancing and reinforcing feedback mechanisms (Richardson, 2011). What this means in system dynamics practice and research is that one is developing and testing feedback explanations for dynamic behaviors of systems.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;System dynamics (SD) is not the only systems science method to emphasize the structure-behavior relationship. For example, network scientists study how the structure of social networks determine the dynamics of diffusion and spread of disease. For network scientists, the structure of the system is typically represented as a graph, e.g., a social network. Similarly, geospatial scientists will look at structure in terms of spatial relationships. There are many other approaches, each focusing on a different facet of systems. However, it is system dynamics that arguably focuses more clearly and explicitly on the interactions of feedback mechanisms over time. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;This interface explores the structure-behavior relationship using the &amp;quot;Limits to Growth&amp;quot; by first breaking down the behavior pattern into phases of behavior modes, then analyzing and comparing the analysis of the feedback loops, and finally exploring the impact of interventions on system behavior. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Click the button [Next Page] at the top right to begin. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;References:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Helvetica&apos;; font-size:12pt;&quot;&gt;Richardson, G. P. (2011, 2011). Reflections on the foundations of system dynamics. &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Helvetica&apos;; font-size:12pt; font-style:italic;&quot;&gt;System Dynamics Review, 27&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Helvetica&apos;; font-size:12pt;&quot;&gt;(3), 219-243. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Helvetica&apos;;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text_box>
+				<button label="" isee:tooltip="" x="1006" y="31">
+					<actions>
+						<action target="next_page">navigate</action>
+					</actions>
+				</button>
+			</view>
+			<isee:templates>
+				<view background="white" page_width="1066" page_height="600" type="template">
+					<style>
+						<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+					</style>
+					<button label="" isee:tooltip="" x="54" y="565">
+						<actions>
+							<action>start_stella_live</action>
+						</actions>
+					</button>
+					<button label="" isee:tooltip="" x="203" y="565">
+						<actions>
+							<action>restore_all</action>
+						</actions>
+					</button>
+					<isee:time_slider interactive="true" appearance="progress" x="261.5" y="545.5" width="386" height="39"/>
+					<button label="" isee:tooltip="" x="54" y="28">
+						<actions>
+							<action target="previous_page">navigate</action>
+						</actions>
+					</button>
+					<button label="" isee:tooltip="" x="1008" y="31">
+						<actions>
+							<action target="next_page">navigate</action>
+						</actions>
+					</button>
+					<button label="" isee:tooltip="" x="128" y="565">
+						<actions>
+							<action>stop_stella_live</action>
+						</actions>
+					</button>
+				</view>
+			</isee:templates>
+			<isee:stories>
+				<isee:story uid="34" name="Story 1">
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style>
+							<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+						</style>
+						<isee:model_view x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true" show_ltm_table="false">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<entity name="Births"/>
+								<entity name="Deaths"/>
+								<entity name="Immigration"/>
+								<entity name="Population"/>
+							</isee:visible_list>
+							<isee:highlight_list/>
+						</isee:model_view>
+					</view>
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style>
+							<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+						</style>
+						<isee:model_view x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true" show_ltm_animation="true" show_ltm_table="true" include_equation="true" include_units="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="25"/>
+								<item uid="6"/>
+								<item uid="5"/>
+								<entity name="Deaths"/>
+								<entity name="Immigration"/>
+								<entity name="Births"/>
+								<item uid="8"/>
+								<item uid="26"/>
+								<item uid="7"/>
+								<item uid="3"/>
+								<entity name="Mortality_Rate"/>
+								<entity name="Crude_Birth_Rate"/>
+								<entity name="Population"/>
+							</isee:visible_list>
+							<isee:highlight_list>
+								<item uid="6"/>
+								<item uid="25"/>
+								<item uid="5"/>
+								<item uid="8"/>
+								<item uid="26"/>
+								<entity name="Mortality_Rate"/>
+								<item uid="7"/>
+								<item uid="3"/>
+								<entity name="Crude_Birth_Rate"/>
+							</isee:highlight_list>
+						</isee:model_view>
+					</view>
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style>
+							<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+						</style>
+						<isee:model_view x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true" show_ltm_animation="true" show_ltm_table="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="9"/>
+								<item uid="25"/>
+								<entity name="Pollution_Breaking_Down"/>
+								<item uid="5"/>
+								<entity name="Crude_Birth_Rate"/>
+								<entity name="Births"/>
+								<item uid="8"/>
+								<entity name="Mortality_Rate"/>
+								<item uid="3"/>
+								<item uid="26"/>
+								<item uid="15"/>
+								<item uid="7"/>
+								<item uid="14"/>
+								<entity name="Population"/>
+								<item uid="28"/>
+								<entity name="Polluting"/>
+								<entity name="Pollution"/>
+								<item uid="6"/>
+								<entity name="Immigration"/>
+								<entity name="Deaths"/>
+								<item uid="13"/>
+							</isee:visible_list>
+							<isee:highlight_list>
+								<item uid="14"/>
+								<item uid="13"/>
+								<item uid="28"/>
+								<entity name="Pollution_Breaking_Down"/>
+								<item uid="15"/>
+								<entity name="Pollution"/>
+								<entity name="Polluting"/>
+								<item uid="9"/>
+							</isee:highlight_list>
+						</isee:model_view>
+					</view>
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style>
+							<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+						</style>
+						<isee:model_view x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true" show_ltm_animation="true" show_ltm_table="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="9"/>
+								<item uid="25"/>
+								<entity name="Deaths"/>
+								<entity name="Crude_Birth_Rate"/>
+								<item uid="5"/>
+								<item uid="31"/>
+								<entity name="Immigration"/>
+								<item uid="27"/>
+								<item uid="28"/>
+								<entity name="Polluting"/>
+								<entity name="Pollution"/>
+								<entity name="Population"/>
+								<item uid="6"/>
+								<entity name="Effect_of_pollution_on_mortality"/>
+								<entity name="Base_Mortality_Rate"/>
+								<item uid="11"/>
+								<entity name="Pollution_Breaking_Down"/>
+								<entity name="Births"/>
+								<item uid="8"/>
+								<item uid="26"/>
+								<item uid="15"/>
+								<entity name="Mortality_Rate"/>
+								<item uid="3"/>
+								<item uid="7"/>
+								<item uid="13"/>
+								<item uid="10"/>
+								<item uid="14"/>
+							</isee:visible_list>
+							<isee:highlight_list>
+								<item uid="27"/>
+								<item uid="11"/>
+								<entity name="Base_Mortality_Rate"/>
+								<entity name="Effect_of_pollution_on_mortality"/>
+								<entity name="Mortality_Rate"/>
+								<item uid="8"/>
+								<item uid="31"/>
+								<item uid="10"/>
+							</isee:highlight_list>
+						</isee:model_view>
+					</view>
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style>
+							<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+						</style>
+						<isee:model_view x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true" show_ltm_animation="true" show_ltm_table="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="9"/>
+								<entity name="Attractiveness_of_City"/>
+								<entity name="Pollution_Breaking_Down"/>
+								<item uid="14"/>
+								<item uid="10"/>
+								<item uid="11"/>
+								<item uid="27"/>
+								<item uid="25"/>
+								<item uid="28"/>
+								<entity name="Polluting"/>
+								<entity name="Pollution"/>
+								<item uid="32"/>
+								<entity name="Population"/>
+								<entity name="Average_Delay_for_Attractiveness_of_City_to_Change_in_Response_to_Mortality"/>
+								<item uid="5"/>
+								<entity name="Births"/>
+								<item uid="15"/>
+								<item uid="8"/>
+								<entity name="Mortality_Rate"/>
+								<item uid="26"/>
+								<item uid="3"/>
+								<item uid="7"/>
+								<item uid="31"/>
+								<item uid="12"/>
+								<entity name="Crude_Birth_Rate"/>
+								<entity name="Effect_of_pollution_on_mortality"/>
+								<entity name="Base_Mortality_Rate"/>
+								<item uid="6"/>
+								<entity name="Immigration"/>
+								<entity name="Deaths"/>
+								<item uid="13"/>
+							</isee:visible_list>
+							<isee:highlight_list>
+								<item uid="12"/>
+								<entity name="Average_Delay_for_Attractiveness_of_City_to_Change_in_Response_to_Mortality"/>
+								<item uid="32"/>
+								<entity name="Attractiveness_of_City"/>
+							</isee:highlight_list>
+						</isee:model_view>
+						<isee:time_slider interactive="true" appearance="progress" x="27.3163" y="3.5" width="257.172" height="39"/>
+					</view>
+					<view background="white" page_width="1066" page_height="600" type="interface">
+						<style>
+							<isee:stacked_container text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+						</style>
+						<isee:model_view x="0" y="0" width="1066" height="600" isee:locked="true" zoom="1" center_x="533" center_y="300" locked_view="true" transparent="true" use_visible_list="true" show_ltm_animation="true" show_ltm_table="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<item uid="25"/>
+								<entity name="Immigration"/>
+								<item uid="7"/>
+								<item uid="5"/>
+								<entity name="Average_Delay_for_Attractiveness_of_City_to_Change_in_Response_to_Mortality"/>
+								<item uid="12"/>
+								<entity name="Crude_Birth_Rate"/>
+								<item uid="14"/>
+								<item uid="27"/>
+								<item uid="28"/>
+								<entity name="Polluting"/>
+								<entity name="Pollution"/>
+								<item uid="9"/>
+								<item uid="11"/>
+								<entity name="Pollution_Breaking_Down"/>
+								<entity name="Attractiveness_of_City"/>
+								<entity name="Population"/>
+								<item uid="32"/>
+								<item uid="10"/>
+								<item uid="31"/>
+								<entity name="Births"/>
+								<item uid="8"/>
+								<entity name="Mortality_Rate"/>
+								<item uid="26"/>
+								<item uid="3"/>
+								<item uid="15"/>
+								<item uid="13"/>
+								<entity name="Base_Mortality_Rate"/>
+								<item uid="6"/>
+								<entity name="Effect_of_pollution_on_mortality"/>
+								<entity name="Deaths"/>
+							</isee:visible_list>
+							<isee:highlight_list/>
+						</isee:model_view>
+					</view>
+				</isee:story>
+			</isee:stories>
+		</views>
+	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name="Base_Immigration_Rate" value="0.14352910023296"/>
+	</isee:controls>
+</xmile>
+
