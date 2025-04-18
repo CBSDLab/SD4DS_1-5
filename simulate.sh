@@ -1,6 +1,10 @@
 #! /bin/awk
-# Simple awk program to read parameters
-# Run this with from the command line with: awk -f simulate study1.csv
+# Simple AWK shell script to run a single simulation
+#
+# Run this with from the command line with: awk -f simulate.sh
+#
+# Created by: Peter S. Hovmand March 24, 2024
+# Revised by: Peter S. Hovmand April 18, 2025
 
 BEGIN {
   # Comment/uncomment lines below depending on the platform
@@ -12,26 +16,8 @@ BEGIN {
 
   # Set Stella command
   STELLA_CMD=STELLA_PATH STELLA_RUN
-}
-
-# Pulls the variable names from the top row of the csv file of parameters
-NR == 1 {
-  varnames = $0
-  }
   
-# Saves each row as a .csv file that can be dynamically linked and
-# and run with a Stella model
-NR >1 {
-  # write the parameters for the row to the Parms.csv import file
-  print varnames "\n" $0 > "Parms.csv"
-  close("Parms.csv")
-  
-  # run the model
+  # Execute the command to run the model
   system(STELLA_CMD)
-  
-  # run the R script to create/append results to the study1.rds file
-  R_CMD="Rscript process_run.R run=" NR - 1 
-  print 
-  system(R_CMD)
-  } 
+}
   
