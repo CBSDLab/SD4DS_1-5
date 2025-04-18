@@ -1,6 +1,6 @@
 # Simulation studies on the HPC using Stella Simulator
 
-This set of exercises introduces running Stella model simulation studies on the HPC using Stella Simulator. 
+This set of exercises introduces running Stella model simulation studies on the HPC using Stella Simulator. The exercises cover the basic steps for checking access to Stella Simulator on the HPC, running an interactive simulation study, and then running a batch simulation study. 
 
 # 1. Cloning this repository in your user directory
 
