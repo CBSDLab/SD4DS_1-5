@@ -98,4 +98,19 @@ exit
 
 # 4. Running simulation study1 as a batch process
 
+So far, we have only shown how to conduct a simulation study using Stella Simulator where the main benefit is having access to Stella Simulator. However, the real advantage of using the HPC comes from being able to set up and run multiple simulations as batch jobs on the HPC. For example, if a single simulation study takes ~2 hours on the HPC, one can submit a series of simulation studies that can all be running as resources become available versus having to run them sequentially on a desktop or laptop computer. 
+
+Batch processing is managed be submitting a batch job with a SLURM script. The simulate_study.slurm script defines computing resources needed along with R modules to load. 
+
+Before submitting the batch job, you'll need to modify the mail-user option to your email address so you can get the notifications of the job status. Once you have made this modification, submit study1 as a batch job, using the `sbatch` command.
+
+```
+sbatch simulate_study.slurm
+```
+
+Unlike the previous examples, you will not see the actual results, but instead a notice that the job has been submitted. At this point, you can exit the session and the job will keep running until completed. 
+
+```
+Submitted batch job 2548367
+```
 
