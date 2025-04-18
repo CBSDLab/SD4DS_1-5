@@ -1,3 +1,12 @@
-# Running simulation studies on the HPC using Stella Simulator
+# Simulation studies on the HPC using Stella Simulator
 
  asdf
+# Exercises
+
+# 1. Cloning this repository in your user directory
+
+# 2. Testing access to Stella Simulator
+
+
+
+# 3. 
