@@ -7,6 +7,7 @@
 
 # 2. Testing access to Stella Simulator
 
+starting a compute node
 
 
 # 3. 
