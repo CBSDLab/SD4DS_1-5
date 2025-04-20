@@ -15,8 +15,8 @@
 
 BEGIN {
   # Comment/uncomment lines below depending on the platform
-  STELLA_PATH="/Applications/Stella_Simulator_3.5.1_Mac_Arm/stella_simulator"
-  # STELLA_PATH="/home/psh39/Stella_Simulator/stella_simulator"
+  # STELLA_PATH="/Applications/Stella_Simulator_3.5.1_Mac_Arm/stella_simulator"
+  STELLA_PATH="/home/psh39/Stella_Simulator/stella_simulator"
   
   # Set the model run simulation arguments
   STELLA_RUN=" -q " "'" MODEL "'"
