@@ -79,7 +79,7 @@ module spider R
 To load the model, we use the `module load` command followed by the module name we want to load. 
 
 ```
-module load R/4.4.2-gfbf-2024a
+module load R/4.1.2-foss-2021b
 ```
 
 Once we have successfully loaded the R module, we are now ready to run the simulate_study.sh AWK script, which runs takes a .csv file with the initial conditions and parameter values in each row corresponding to the values to be used for that row. For each simulation, the row for that simulation run is copied to the Parms.csv file. The Stella model is then run in Stella Simulator, which saves the results from the current run in the Results.csv file. We are normally only interested in some variables and values, and these need to be processed into another file for the simulation study results. Hence, simulate_study.sh then calls the process_run.R file, which selects the variables and appends the data frame to the previous results, saving them in study1_results.csv file. 
