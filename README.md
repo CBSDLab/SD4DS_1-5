@@ -114,3 +114,7 @@ Unlike the previous examples, you will not see the actual results, but instead a
 Submitted batch job 2548367
 ```
 
+# Further reading
+
+For more information on reading and writing large files in R, see [Section 5.6](https://bookdown.org/csgillespie/efficientR/input-output.html) from Colin Gillespie and Robin Lovelace's *Efficient R programming*.
+

@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+test.awk
+Old files
+Results_*
+*.RData
+*.xlsx
+test.out
+study_results.csv
+SD4DS_1-5.Rproj

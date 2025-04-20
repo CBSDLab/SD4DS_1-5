@@ -5,6 +5,7 @@
 # Revised by: 
 
 library(fs)
+library(readr)
 
 # This searches for the results files with filenames in the form of Results_ 
 # which includes Results_1.csv, Results_10.csv, etc. but excludes Results.csv
@@ -18,7 +19,7 @@ processed_results <- NULL
 # runs, hence the files are read in a numeric order
 for (i in 1:length(results_list)) {
   # Read in the .csv file for simulation run i
-  tmp<-read.csv(file=paste0("Results_",i,".csv"))
+  tmp<-read_csv(file=paste0("Results_",i,".csv"), show_col_types = FALSE)
   
   # Process the data for simulation run i
   tmp_df <- data.frame(Run = i,
