@@ -76,19 +76,29 @@ Next, we load the R module. R modules are constantly being updated with older ve
 module spider R
 ```
 
-To load the model, we use the `module load` command followed by the module name we want to load. 
+To load the model, we use the `module load` command followed by the module name we want to load. Note that the specific version of R below should match what is available from the `module spider R` output above. If these don't match, load a more recent version of R.
 
 ```
 module load R/4.1.2-foss-2021b
 ```
 
-Once we have successfully loaded the R module, we are now ready to run the simulate_study.sh AWK script, which runs takes a .csv file with the initial conditions and parameter values in each row corresponding to the values to be used for that row. For each simulation, the row for that simulation run is copied to the Parms.csv file. The Stella model is then run in Stella Simulator, which saves the results from the current run in the Results.csv file. We are normally only interested in some variables and values, and these need to be processed into another file for the simulation study results. Hence, simulate_study.sh then calls the process_run.R file, which selects the variables and appends the data frame to the previous results, saving them in study1_results.csv file. 
-
-To run the simulation study interactively, we type:
+Once we have successfully loaded the R module, we are now ready to run the simulate_study.awk script, which takes a .csv file with the initial conditions and parameter values for each row corresponding to the values to be used for the run. For each simulation, the row for that simulation run is copied to the Parms.csv file and then Stella Simulator is called, which the results from the current run in the Results.csv file. The script then copies the Results.csv file to a unique filename associated with the run, i.e., Result_1.csv, Results_2.csv, etc.
 
 ```
-awk -f simulate_study.sh study1.csv
+awk -f simulate_study.awk -v MODEL="limits to growth.stmx" study1.csv
 ```
+
+We are normally only interested in some variables and values. For example, depending on how the Stella model is defined, the results from each time step may be saved. For example, the Limits to Growth Model simulates a population from 0 to 100 years in time steps of 1/1024 years for a total of 102,400 points in time for each of the 9 variables in the models or close to 1 million values *per simulation* even though this is a small system dynamics models. 
+
+We are usually only interested in a subset of variables and time points. While we can specify this with the Stella model to reduce the number of values saved and shortern the simulation time and save on disk space, we might not know *a priori* what we are most interested in using in model analysis. Moreover, if we modify the model itself for a particular analysis (e.g., changing the time step from 1/1024 years to 1/4 years), we increase the likelihood of misinterpreting the results. Hence, it is usually best to keep the model the same for all the analyses and select the variables and time points we are interested in post-simulation. 
+
+This is accomplished with the process_results.R script, which looks and combines files with the filenames begining with Results_, selects the variables of interest and then saves the combined file as an .Rdata binary object. You can modify this file to change how you want to read in the files, select variables, and combine results. The process_results.R script is called with the `Rscript` command.
+
+```
+Rscript process_results.R
+```
+
+Afte this script is called, you'll see the results saved in the study_results.RData file and the temporary files Results_1.csv, Results_2.csv etc. deleted as the scripts cleans up the directory after the simulation. 
 
 Last, exit the session on the compute node. 
 
@@ -105,7 +115,7 @@ Batch processing is managed be submitting a batch job with a SLURM script. The s
 Before submitting the batch job, you'll need to modify the mail-user option to your email address so you can get the notifications of the job status. Once you have made this modification, submit study1 as a batch job, using the `sbatch` command.
 
 ```
-sbatch simulate_study.slurm
+sbatch simulate_study1.slurm
 ```
 
 Unlike the previous examples, you will not see the actual results, but instead a notice that the job has been submitted. At this point, you can exit the session and the job will keep running until completed. 
@@ -113,6 +123,10 @@ Unlike the previous examples, you will not see the actual results, but instead a
 ```
 Submitted batch job 2548367
 ```
+
+Once completed, the simulate_study1.slurm script saves the results from timing the simulation to the file timing_study1.out. 
+
+
 
 # Further reading
 
