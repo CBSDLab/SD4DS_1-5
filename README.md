@@ -70,19 +70,7 @@ To run the simulation study interactively, we start again by requesting a comput
 srun -n 1 --pty bash
 ```
 
-Next, we load the R module. R modules are constantly being updated with older versions removed. To find the available module, we can use the `spider` command. 
-
-```
-module spider R
-```
-
-To load the model, we use the `module load` command followed by the module name we want to load. Note that the specific version of R below should match what is available from the `module spider R` output above. If these don't match, load a more recent version of R.
-
-```
-module load R/4.1.2-foss-2021b
-```
-
-Once we have successfully loaded the R module, we are now ready to run the simulate_study.awk script, which takes a .csv file with the initial conditions and parameter values for each row corresponding to the values to be used for the run. For each simulation, the row for that simulation run is copied to the Parms.csv file and then Stella Simulator is called, which the results from the current run in the Results.csv file. The script then copies the Results.csv file to a unique filename associated with the run, i.e., Result_1.csv, Results_2.csv, etc.
+ we are now ready to run the simulate_study.awk script, which takes a .csv file with the initial conditions and parameter values for each row corresponding to the values to be used for the run. For each simulation, the row for that simulation run is copied to the Parms.csv file and then Stella Simulator is called, which the results from the current run in the Results.csv file. The script then copies the Results.csv file to a unique filename associated with the run, i.e., Result_1.csv, Results_2.csv, etc.
 
 ```
 awk -f simulate_study.awk -v MODEL="limits to growth.stmx" study1.csv
@@ -98,7 +86,40 @@ This is accomplished with the process_results.R script, which looks and combines
 Rscript process_results.R
 ```
 
-Afte this script is called, you'll see the results saved in the study_results.RData file and the temporary files Results_1.csv, Results_2.csv etc. deleted as the scripts cleans up the directory after the simulation. 
+Afte this script is called, you'll see the results saved in the study_results.RData file and the temporary files Results_1.csv, Results_2.csv etc. deleted as the scripts cleans up the directory after the simulation. Use the `ls Results_*` command to see the results. You should see something like the following in the directory of your simulation. 
+
+```
+[psh39@compt339 SD4DS_1-5]$ ls Results_*
+Results_10.csv  Results_13.csv  Results_16.csv  Results_19.csv  Results_2.csv  Results_5.csv  Results_8.csv
+Results_11.csv  Results_14.csv  Results_17.csv  Results_1.csv   Results_3.csv  Results_6.csv  Results_9.csv
+Results_12.csv  Results_15.csv  Results_18.csv  Results_20.csv  Results_4.csv  Results_7.csv
+```
+
+Next, we are ready to start processing the results in R, but frist we need to load the R module. R modules are constantly being updated with older versions removed. To find the available module, we can use the `spider` command. 
+
+```
+module spider R
+```
+
+To load the R module, we use the `module load` command followed by the module name we want to load. Note that the specific version of R below should match what is available from the `module spider R` output above. If these don't match, load a more recent version of R.
+
+```
+module load R/4.1.2-foss-2021b
+```
+
+Once we have successfully loaded the R module, we can process the results using Rscript process_results.R by calling the Rscript command. 
+
+```
+Rscript process_results.R
+```
+
+If you now type the `ls` command to see the files in your directory, you'll notice that the temporary files Results_1.csv, Results_2.csv, etc. have been removed and the file study_results.RData has been created, which is an R binary data object with just the values we wanted to save. 
+
+```
+[psh39@compt339 SD4DS_1-5]$ ls
+'limits to growth.stmx'   process_results.R   Results.csv   simulate_study1.slurm   study1.csv   study_results.RData
+ Parms.csv                README.md           simulate.sh   simulate_study.awk      study2.csv
+```
 
 Last, exit the session on the compute node. 
 
