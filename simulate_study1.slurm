@@ -9,8 +9,9 @@
 
 #SBATCH -o serial-R.out%j # capture jobid in output file name
 
-# load R module
-module load R/4.4.2-gfbf-2024a
-
 # run simulation study using AWK script
 awk -f simulate_study.awk -v MODEL="limits to growth.stmx" study1.csv
+
+# load R module to process results
+module load R/4.4.2-gfbf-2024a
+Rscript process_results.R
