@@ -13,4 +13,4 @@
 module load R/4.4.2-gfbf-2024a
 
 # run simulation study using AWK script
-awk -f simulate_study.sh study1.csv
+awk -f simulate_study.awk -v MODEL="limits to growth.stmx" study1.csv
