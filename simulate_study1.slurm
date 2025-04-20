@@ -3,7 +3,7 @@
 #SBATCH -c 1
 #SBATCH -t 1:00:00
 #SBATCH --output=my.stdout 
-#SBATCH --mail-user=psh39@case.edu 
+#SBATCH --mail-user=<your email address>
 #SBATCH --mail-type=ALL 
 #SBATCH --job-name="Study 1 Limits to Growth"
 
