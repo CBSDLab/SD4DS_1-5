@@ -13,5 +13,5 @@
 awk -f simulate_study.awk -v MODEL="limits to growth.stmx" study1.csv
 
 # load R module to process results
-module load R/4.4.2-gfbf-2024a
+module load R/4.1.2-foss-2021b
 Rscript process_results.R
