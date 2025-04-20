@@ -133,7 +133,18 @@ So far, we have only shown how to conduct a simulation study using Stella Simula
 
 Batch processing is managed be submitting a batch job with a SLURM script. The simulate_study.slurm script defines computing resources needed along with R modules to load. 
 
-Before submitting the batch job, you'll need to modify the mail-user option to your email address so you can get the notifications of the job status. Once you have made this modification, submit study1 as a batch job, using the `sbatch` command.
+Before submitting the batch job, you'll need to modify the mail-user option to your email address so you can get the notifications of the job status, i.e., replace "<your email address>" with the email address where you want to receive notifcations about the job starting and finishing. For example, if your email address is abc123@case.edu, you would change the line from,
+
+```
+#SBATCH --mail-user=<your email address> 
+```
+to
+
+```
+#SBATCH --mail-user=abc123@case.edu. 
+```
+
+Once you have made this modification, submit study1 as a batch job, using the `sbatch` command.
 
 ```
 sbatch simulate_study1.slurm
@@ -144,10 +155,16 @@ Unlike the previous examples, you will not see the actual results, but instead a
 ```
 Submitted batch job 2548367
 ```
+Once completed, the simulate_study1.slurm script saves the results from timing the simulation to the file timing_study1.out. To see how long the script took, use the `cat timing_study1.out` to display the file with the results to the terminal.
 
-Once completed, the simulate_study1.slurm script saves the results from timing the simulation to the file timing_study1.out. 
-
-
+```
+[psh39@compt339 SD4DS_1-5]$ cat timing_study1.out
+Study 1 Limits to Growth
+real    0m16.627s
+user    0m10.960s
+sys     0m1.824s
+```
+There are three times provided: real, user, and sys. The real time is the actual time on the wall that it took to complete this job from begining to end (16.627 seconds). the user time is how much time was used to execute the program (10.960 seconds). And, the sys time is how much time it took for the operating system to support our program (1.824 seconds), which includes time used to access a disk, load a module, etc. Practically, we are most concerned with the overall real time since that is what we are working with and this is close to what is reported in the job completion email. 
 
 # Further reading
 
