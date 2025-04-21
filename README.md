@@ -166,7 +166,19 @@ sys     0m1.824s
 ```
 There are three times provided: real, user, and sys. The real time is the actual time on the wall that it took to complete this job from begining to end (16.627 seconds). the user time is how much time was used to execute the program (10.960 seconds). And, the sys time is how much time it took for the operating system to support our program (1.824 seconds), which includes time used to access a disk, load a module, etc. Practically, we are most concerned with the overall real time since that is what we are working with and this is close to what is reported in the job completion email. 
 
-# Further reading
+# 5. On your own
 
-For more information on reading and writing large files in R, see [Section 5.6](https://bookdown.org/csgillespie/efficientR/input-output.html) from Colin Gillespie and Robin Lovelace's *Efficient R programming*.
+Copy and modify the SLURM script to design and conduct a simulation study using the Limits to Growth.stmx model and study2.csv file. 
+
+# 6. Some things to note
+
+There are several things to pay attention to as you beyond this initial example. 
+
+1. How you write your `process_results.R` script can have a significant on how long it takes to complete and process the simulation. Paying attention to the timing of the simulation models can help identify areas to improve the efficiency of your simulation studies (not only saving you time, but also energy and the carbon footprint of your simulation). For example, the base R function for reading a .csv file, read.csv() is significantly slower for large files than the readr library function read_csv(). See [Section 5.6](https://bookdown.org/csgillespie/efficientR/input-output.html) from Colin Gillespie and Robin Lovelace's *Efficient R programming*.
+
+2. We ran all the simulations in the same director, but if we want to start more than one process at a time, we need to run each simulation in its own directory. Otherwise, we'll have a situation where two or more jobs are overwriting their simulation results.
+
+3. We have not talked about how the study.csv file is constructed, but how we do that becomes important if we are to have meaningful interpretations of the results. For some studies, we might want to randomly sample values across a parameter space. For other studies, however, we'll want to define the runs in a way that the results are ordered. How we do this is an essential aspect of the design of a simulation study, which will be convered in a subsequent exercise. 
+
+
 
