@@ -2,7 +2,7 @@
 
 This set of exercises introduces running Stella model simulation studies on the HPC using Stella Simulator. The exercises cover the basic steps for checking access to Stella Simulator on the HPC, running an interactive simulation study, and then running a batch simulation study. 
 
-# 1. Cloning this repository in your user directory
+## 1. Cloning this repository in your user directory
 
 The first thing to do is clone this Github repository into the local directory of your user account. This will copy all the files from the respository that you will need for this exercise. To do this, first create a directory to save your SD4DS exercises, e.g., SD4DS. This can be done through the OnDemand Files interface or directly through a terminal.
 
@@ -24,7 +24,7 @@ Now clone the directory in the terminal with the `git clone` command.
 git clone https://github.com/CBSDLab/SD4DS_1-5.git
 ```
 
-# 2. Testing access to Stella Simulator
+## 2. Testing access to Stella Simulator
 
 The HPC has head nodes and compute nodes. When you log into the HPC, you log into a head node. Head nodes are *not* to be used for computations. Always use *compute* nodes for any computation. 
 
@@ -62,7 +62,7 @@ exit
 
 We're now ready to move forward in running a simulation study. 
 
-# 3. Running simulation study1 interactively
+## 3. Running simulation study1 interactively
 
 To run the simulation study interactively, we start again by requesting a compute node. 
 
@@ -127,7 +127,7 @@ Last, exit the session on the compute node.
 exit
 ```
 
-# 4. Running simulation study1 as a batch process
+## 4. Running simulation study1 as a batch process
 
 So far, we have only shown how to conduct a simulation study using Stella Simulator where the main benefit is having access to Stella Simulator. However, the real advantage of using the HPC comes from being able to set up and run multiple simulations as batch jobs on the HPC. For example, if a single simulation study takes ~2 hours on the HPC, one can submit a series of simulation studies that can all be running as resources become available versus having to run them sequentially on a desktop or laptop computer. 
 
@@ -166,11 +166,11 @@ sys     0m1.824s
 ```
 There are three times provided: real, user, and sys. The real time is the actual time on the wall that it took to complete this job from begining to end (16.627 seconds). the user time is how much time was used to execute the program (10.960 seconds). And, the sys time is how much time it took for the operating system to support our program (1.824 seconds), which includes time used to access a disk, load a module, etc. Practically, we are most concerned with the overall real time since that is what we are working with and this is close to what is reported in the job completion email. 
 
-# 5. On your own
+## 5. On your own
 
 Copy and modify the SLURM script to design and conduct a simulation study using the Limits to Growth.stmx model and study2.csv file. 
 
-# 6. Some things to note
+## 6. Some things to note
 
 There are several things to pay attention to as you beyond this initial example. 
 
