@@ -2,6 +2,8 @@
 
 This set of exercises introduces running Stella model simulation studies on the HPC using Stella Simulator. The exercises cover the basic steps for checking access to Stella Simulator on the HPC, running an interactive simulation study, and then running a batch simulation study. 
 
+# Exercises
+
 ## 1. Cloning this repository in your user directory
 
 The first thing to do is clone this Github repository into the local directory of your user account. This will copy all the files from the respository that you will need for this exercise. To do this, first create a directory to save your SD4DS exercises, e.g., SD4DS. This can be done through the OnDemand Files interface or directly through a terminal.
